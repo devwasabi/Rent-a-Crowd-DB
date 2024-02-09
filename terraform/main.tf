@@ -10,13 +10,13 @@ module "db" {
   major_engine_version = "16.00"             # DB option group
   instance_class       = "db.t3.micro"
 
-  allocated_storage     = 2
-  max_allocated_storage = 5
+  allocated_storage     = 20
+  max_allocated_storage = 30
 
   # Encryption at rest is not available for DB instances running SQL Server Express Edition
   storage_encrypted = false
 
-  username = "bbd-rent-a-crowd"
+  username = "bbdRentACrowd"
   port     = 1433
 
   multi_az               = false
@@ -32,6 +32,7 @@ module "db" {
   timezone                  = "GMT Standard Time"
   character_set_name        = "Latin1_General_CI_AS"
 
+  create_db_option_group = false
 }
 
 # Setting up of the VPCs required
