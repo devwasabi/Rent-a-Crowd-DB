@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - devwasabi_workflow
+      - terraform
   pull_request:
 
 # Permission can be added at job level or workflow level
