@@ -18,7 +18,7 @@ jobs:
   build:
     name: Automate Database Migration Build
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment: 'build' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configured 
     env:
       stage: 'Build'
@@ -36,17 +36,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Git checkout
         uses: actions/checkout@v3
-
-      - name: Download Flyway
-        run: wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/7.7.0/flyway-commandline-7.7.0-linux-x64.tar.gz | tar xvz
-
-      - name: Set up Flyway
-        run: |
-          export FLYWAY_HOME=$(pwd)/flyway-7.7.0
-          export PATH=$PATH:$FLYWAY_HOME
-
-      - name: Verify Flyway Installation
-        run: flyway -version
       
       # Runs the Flyway Clean command against the Build database
       - name: Migrate Build DB
