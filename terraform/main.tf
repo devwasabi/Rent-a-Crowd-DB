@@ -1,8 +1,11 @@
+locals {
+  name     = "rent-a-crowd-mssql"
+}
 
 module "db" {
   source = "terraform-aws-modules/rds/aws"
 
-  identifier = "rent-a-crowd-mssql"
+  identifier = local.name
 
   engine               = "sqlserver-ex"
   engine_version       = "16.00"
@@ -19,10 +22,12 @@ module "db" {
   username = "bbdRentACrowd"
   port     = 1433
 
-  multi_az               = false
+  multi_az = false
 
-  maintenance_window              = "Mon:00:00-Mon:03:00"
-  backup_window                   = "03:00-06:00"
+  maintenance_window = "Mon:00:00-Mon:03:00"
+  backup_window      = "03:00-06:00"
+  # enabled_cloudwatch_logs_exports = ["error"]
+  # create_cloudwatch_log_group     = true
 
   backup_retention_period = 1
   skip_final_snapshot     = true
@@ -34,5 +39,3 @@ module "db" {
 
   create_db_option_group = false
 }
-
-# Setting up of the VPCs required
