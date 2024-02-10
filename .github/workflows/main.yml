@@ -40,7 +40,7 @@ jobs:
       - name: Migrate Build DB
         if: env.executeBuild == 'true'
         run: |
-          flyway -baselineOnMigrate="true" -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.conf" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" info migrate info -url="${{ secrets.DB_CONNECTION_STRING }}" -cleanDisabled='false' -reportFilename="Reports\ValidateVScripts" -user="${{ secrets.DB_USERNAME }}" -password="${{ secrets.DB_PASSWORD }}"
+          flyway -user="${{ secrets.DB_USERNAME }}" -password="${{ secrets.DB_PASSWORD }}" -baselineOnMigrate="true" -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.conf" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" info migrate info -url="${{ secrets.DB_CONNECTION_STRING }}" -cleanDisabled='false' -reportFilename="Reports\ValidateVScripts" -user="${{ secrets.DB_USERNAME }}" -password="${{ secrets.DB_PASSWORD }}"
         
   deploy:
     runs-on: ubuntu-latest
