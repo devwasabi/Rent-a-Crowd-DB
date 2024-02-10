@@ -6,5 +6,4 @@ provider "aws" {
       created-using = "Terraform"
     }
   }
-  profile = "AdministratorAccess-924511948270"
 }
