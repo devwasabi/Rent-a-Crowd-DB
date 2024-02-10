@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - devwasabi_workflow
   pull_request:
 
 # Permission can be added at job level or workflow level
@@ -10,10 +11,6 @@ permissions:
   id-token: write # This is required for aws oidc connection
   contents: read # This is required for actions/checkout
   pull-requests: write # This is required for the github bot to comment on our pull requests
-
-env:
-  AWS_REGION: eu-west-1 # Seans region
-  IAM_ROLE_ARN: arn:aws:iam::924511948270:role/Rent-A-CrowdDatabaseLevelupGithubActions
 
 jobs:
   deploy:
@@ -30,14 +27,19 @@ jobs:
       - name: Configure AWS credentials from AWS account
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ env.IAM_ROLE_ARN }}
-          aws-region: ${{ enc.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
           role-session-name: Github-OIDC-TERRAFORM
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.6
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
 
       - name: Terraform Init 
         id: init
@@ -46,6 +48,10 @@ jobs:
           AWS_BUCKET_KEY_NAME: ${{ secrets.AWS_BUCKET_KEY_NAME }}
         working-directory: ./terraform
         run: terraform init -backend-config="bucket=${AWS_BUCKET_NAME}" -backend-config="key=${AWS_BUCKET_KEY_NAME}" -backend-config="region=${AWS_REGION}"
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
