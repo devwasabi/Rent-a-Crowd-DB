@@ -14,6 +14,34 @@ permissions:
   pull-requests: write # This is required for the github bot to comment on our pull requests
 
 jobs:
+  # Flyway migration tool automated build"
+  build:
+    name: Deploy Build
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    environment: 'build' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configured 
+    env:
+      stage: 'Build'
+      
+      # Environment Secrets - In Real Ensure all of the below have been created as an Environment Secret (Projects Settings > Secrets > Actions section, specially related to the environment in question) #
+      databaseName: ${{ secrets.DATABASE_NAME }}
+      JDBC: ${{ secrets.DB_URL }}
+
+      displayName: 'Build'
+      executeBuild: true
+      publishArtifacts: true
+ 
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      # Runs the Flyway Clean command against the Build database
+      - name: Migrate Build DB
+        if: env.executeBuild == 'true'
+        run: |
+          flyway -baselineOnMigrate="true" -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.conf" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" info migrate info -url="${{ secrets.DB_CONNECTION_STRING }}" -cleanDisabled='false' -reportFilename="Reports\ValidateVScripts" -user="${{ secrets.DB_USERNAME }} -password="${{ secrets.DB_PASSWORD }}
+        
   deploy:
     runs-on: ubuntu-latest
     defaults:
