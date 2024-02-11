@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[UserInfo](
     gender CHAR NOT NULL,
     ageGroup VARCHAR(10) NOT NULL,
     dateOfBirth DATE NOT NULL,
-    createdAt DATETIME2 DEFAULT GETDATE(), 
+    createdAt DATETIME2 DEFAULT GETDATE(),
     isActive BIT DEFAULT 0 
 );
 GO
@@ -23,4 +23,6 @@ ALTER TABLE [dbo].[UserInfo]
 ADD CONSTRAINT CK_Gender CHECK (gender IN ('f', 'm'));
 
 GO
+ALTER TABLE UserInfo
+	ADD email VARCHAR(255) NOT NULL UNIQUE;
 
