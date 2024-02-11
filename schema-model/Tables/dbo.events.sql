@@ -16,7 +16,7 @@ ADD CONSTRAINT CK_Events_AgeGroup CHECK (ageGroup IN ('toddler', 'youth', 'adult
 GO
 
 ALTER TABLE [dbo].[Events]
-ADD CONSTRAINT CK_Events_GenderSpec CHECK (genderSpec IN ('f', 'm'));
+ADD CONSTRAINT CK_Events_GenderSpec CHECK (genderSpec IN ('f', 'm','b'));
 
 GO
 
@@ -35,4 +35,8 @@ GO
 -- Add Primary Key Constraint for eventId
 ALTER TABLE [dbo].[Events]
 	ADD CONSTRAINT PK_Events PRIMARY KEY (eventId);
+GO
+
+ALTER TABLE [dbo].[Events]
+ADD payable INT DEFAULT 0;
 GO
