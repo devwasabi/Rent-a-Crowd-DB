@@ -8,7 +8,6 @@ on:
   pull_request:
 
 env:
-  SQLFLUFF_DIALECT: postgres
   DOCKER_IMAGE: redgate/flyway
 	SCHEMAS: public
 
