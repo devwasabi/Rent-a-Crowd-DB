@@ -41,7 +41,7 @@ jobs:
       - name: Migrate Build DB
         if: env.executeBuild == 'true'
         run: |
-          flyway -user="${{secrets.DB_USERNAME}}" -password="${{secrets.DB_PASSWORD}}" -url="jdbc:sqlserver://rent-a-crowd-mssql.cwnn1s7lxjgf.eu-west-1.rds.amazonaws.com:1433;authentication=sqlPassword;databaseName=Test;encrypt=true;trustServerCertificate=true" info migrate
+          flyway -user="${{secrets.DB_USERNAME}}" -password="${{secrets.DB_PASSWORD}}" info migrate
   deploy:
     name: Automate Database Server Deployment
     runs-on: ubuntu-latest
