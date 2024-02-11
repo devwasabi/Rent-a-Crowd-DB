@@ -7,6 +7,11 @@ on:
       - terraform
   pull_request:
 
+env:
+  SQLFLUFF_DIALECT: postgres
+  DOCKER_IMAGE: redgate/flyway
+	SCHEMAS: public
+
 # Permission can be added at job level or workflow level
 permissions:
   id-token: write # This is required for aws oidc connection
@@ -14,34 +19,25 @@ permissions:
   pull-requests: write # This is required for the github bot to comment on our pull requests
 
 jobs:
-  # Flyway migration tool automated build"
-  build:
-    name: Automate Database Migration Build
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-    environment: 'build' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configured 
-    env:
-      stage: 'Build'
-      
-      # Environment Secrets - In Real Ensure all of the below have been created as an Environment Secret (Projects Settings > Secrets > Actions section, specially related to the environment in question) #
-      databaseName: ${{ secrets.DB_NAME }}
-      JDBC: ${{ secrets.DB_URL }}
+  Continuous-Integration-Build:
+    name: Continuous Integration Build
+    runs-on: ubuntu-20.04
 
-      displayName: 'Build'
-      executeBuild: true
-      publishArtifacts: true
- 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Git checkout
-        uses: actions/checkout@v3
-      
-      # Runs the Flyway migration command against the Build database
-      - name: Migrate Build DB
-        if: env.executeBuild == 'true'
-        run: |
-          flyway -user="${{secrets.DB_USERNAME}}" -password="${{secrets.DB_PASSWORD}}" info migrate
+      - name: Checkout
+        uses: actions/checkout@v3.0.0
+
+      - name: Continuous Integration Flyway Clean Migrate
+        run: >-
+          docker run --rm
+          --volume ${{ github.workspace }}/migrations:/flyway/sql:ro
+          "${{ env.DOCKER_IMAGE }}"
+          -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}"
+          -url="jdbc:sqlserver://rent-a-crowd-mssql.cwnn1s7lxjgf.eu-west-1.rds.amazonaws.com:1433;authentication=sqlPassword;databaseName=Test;encrypt=true;trustServerCertificate=true"
+          -user="${{ secrets.DB_USERNAME }}"
+          -password="${{ secrets.DB_PASSWORD }}"
+          -cleanDisabled=false clean migrate -schemas="${{ env.SCHEMAS }}"
+  
   deploy:
     name: Automate Database Server Deployment
     runs-on: ubuntu-latest
