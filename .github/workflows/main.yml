@@ -24,7 +24,7 @@ jobs:
       stage: 'Build'
       
       # Environment Secrets - In Real Ensure all of the below have been created as an Environment Secret (Projects Settings > Secrets > Actions section, specially related to the environment in question) #
-      databaseName: ${{ secrets.DATABASE_NAME }}
+      databaseName: ${{ secrets.DB_NAME }}
       JDBC: ${{ secrets.DB_URL }}
 
       displayName: 'Build'
