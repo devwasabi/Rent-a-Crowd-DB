@@ -41,7 +41,7 @@ jobs:
       - name: Migrate Build DB
         if: env.executeBuild == 'true'
         run: |
-          flyway -user="bbdRentACrowd"  info migrate
+          flyway -user="${{secrets.DB_USERNAME}}"  info migrate
         
   deploy:
     name: Automate Database Server Deployment
