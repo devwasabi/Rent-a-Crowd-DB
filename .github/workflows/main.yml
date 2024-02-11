@@ -41,8 +41,7 @@ jobs:
       - name: Migrate Build DB
         if: env.executeBuild == 'true'
         run: |
-          flyway -user="${{secrets.DB_USERNAME}}"  info migrate
-        
+          flyway -user="${{secrets.DB_USERNAME}}" -password="${{secrets.DB_PASSWORD}}" info migrate
   deploy:
     name: Automate Database Server Deployment
     runs-on: ubuntu-latest
