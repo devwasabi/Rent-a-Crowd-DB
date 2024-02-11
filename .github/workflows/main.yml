@@ -37,11 +37,11 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v3
       
-      # Runs the Flyway Clean command against the Build database
+      # Runs the Flyway migration command against the Build database
       - name: Migrate Build DB
         if: env.executeBuild == 'true'
         run: |
-          flyway -user="${{ secrets.DB_USERNAME }}" -password="${{ secrets.DB_PASSWORD }}" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" info migrate info -cleanDisabled='false' -reportFilename="Reports\ValidateVScripts"
+          flyway -user="${{ secrets.DB_USERNAME }}" -password="${{ secrets.DB_PASSWORD }}" info
         
   deploy:
     name: Automate Database Server Deployment
