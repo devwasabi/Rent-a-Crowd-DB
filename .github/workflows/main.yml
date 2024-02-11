@@ -8,8 +8,8 @@ on:
   pull_request:
 
 env:
-  DOCKER_IMAGE: redgate/flyway
-	SCHEMAS: public
+    DOCKER_IMAGE: redgate/flyway
+	  SCHEMAS: public
 
 # Permission can be added at job level or workflow level
 permissions:
