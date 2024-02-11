@@ -8,8 +8,9 @@ on:
   pull_request:
 
 env:
+    SQLFLUFF_DIALECT: postgres
     DOCKER_IMAGE: redgate/flyway
-	  SCHEMAS: public
+        SCHEMAS: public
 
 # Permission can be added at job level or workflow level
 permissions:
