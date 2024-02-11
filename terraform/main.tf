@@ -21,6 +21,7 @@ module "db" {
 
   username = "bbdRentACrowd"
   port     = 1433
+  publicly_accessible = true
 
   multi_az = false
 
