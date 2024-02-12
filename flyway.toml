@@ -117,4 +117,4 @@ ignoreWithEncryption = false
 ignoreWithNoCheck = true
 
 [environments.default]
-url = "jdbc:sqlserver://rent-a-crowd-mssql.cwnn1s7lxjgf.eu-west-1.rds.amazonaws.com:1433;authentication=sqlPassword;databaseName=Test;encrypt=true;trustServerCertificate=true"
+url = "jdbc:sqlserver://rent-a-crowd-mssql.cwnn1s7lxjgf.eu-west-1.rds.amazonaws.com:1433;authentication=sqlPassword;databaseName=RentACrowd;encrypt=true;trustServerCertificate=true"
