@@ -35,7 +35,7 @@ jobs:
           -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}"
           -url="jdbc:sqlserver://rent-a-crowd-mssql.cwnn1s7lxjgf.eu-west-1.rds.amazonaws.com:1433;databaseName=Test;encrypt=true;trustServerCertificate=true"
           -user="${{ secrets.DB_USERNAME }}"
-          -password="${{ secrets.DB_PASSWORD }}"
+          -password="MXCU83WecV)$6T1eQI8-MiT-?}Xr"
           -cleanDisabled=false clean migrate -schemas="public"
           
   
