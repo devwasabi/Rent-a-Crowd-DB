@@ -34,8 +34,8 @@ jobs:
           redgate/flyway
           -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}"
           -url="${{ secrets.DB_URL }}"
-          -user="${{ secrets.DB_USERNAME }}"
-          -password="${{ secrets.DB_PASSWORD }}"
+          -user="bbdFlywayMigration"
+          -password="flyway$Migration$Tool"
           -cleanDisabled=false clean migrate
           
   
