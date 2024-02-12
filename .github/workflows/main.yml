@@ -33,9 +33,9 @@ jobs:
           --volume ${{ github.workspace }}/migrations:/flyway/sql:ro
           redgate/flyway
           -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}"
-          -url="jdbc:sqlserver://rent-a-crowd-mssql.cwnn1s7lxjgf.eu-west-1.rds.amazonaws.com:1433;databaseName=RentACrowd;encrypt=true;trustServerCertificate=true"
-          -user="bbdFlywayMigration"
-          -password="flyway$Migration$Tool"
+          -url="${{ secrets.DB_URL }}"
+          -user="${{ secrets.DB_USERNAME }}"
+          -password="${{ secrets.DB_PASSWORD }}"
           -cleanDisabled=false clean migrate
           
   
