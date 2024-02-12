@@ -36,7 +36,7 @@ jobs:
           -url="jdbc:sqlserver://rent-a-crowd-mssql.cwnn1s7lxjgf.eu-west-1.rds.amazonaws.com:1433;databaseName=Test;encrypt=true;trustServerCertificate=true"
           -user="${{ secrets.DB_USERNAME }}"
           -password="lesedijonas"
-          -cleanDisabled=false clean migrate -schemas="public"
+          -cleanDisabled=false clean migrate
           
   
   deploy:
