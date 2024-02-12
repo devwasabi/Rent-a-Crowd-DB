@@ -1,3 +1,3 @@
 [environments.target1]
 user = "bbdRentACrowd"
-password = "MXCU83WecV)$6T1eQI8-MiT-?}Xr"
+password = "${localSecret.Flyway Desktop e54e1d98-aa81-4217-a2a4-16dbcf022429}"
