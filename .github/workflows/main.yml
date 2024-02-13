@@ -1,4 +1,4 @@
-name: "Terraform action"
+name: "Flyway and Terraform action"
 on:
   push:
     branches:
@@ -7,6 +7,11 @@ on:
       - terraform
   pull_request:
 
+# env:
+#     SQLFLUFF_DIALECT: postgres
+#     DOCKER_IMAGE: redgate/flyway
+#         SCHEMAS: public
+
 # Permission can be added at job level or workflow level
 permissions:
   id-token: write # This is required for aws oidc connection
@@ -14,35 +19,28 @@ permissions:
   pull-requests: write # This is required for the github bot to comment on our pull requests
 
 jobs:
-  # Flyway migration tool automated build"
-  build:
-    name: Deploy Build
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-    environment: 'build' #Ensure this environment name is setup in the projects Settings>Environment area. Ensuring any reviewers are also configured 
-    env:
-      stage: 'Build'
-      
-      # Environment Secrets - In Real Ensure all of the below have been created as an Environment Secret (Projects Settings > Secrets > Actions section, specially related to the environment in question) #
-      databaseName: ${{ secrets.DATABASE_NAME }}
-      JDBC: ${{ secrets.DB_URL }}
+  Continuous-Integration-Build:
+    name: Continuous Integration Build
+    runs-on: ubuntu-20.04
 
-      displayName: 'Build'
-      executeBuild: true
-      publishArtifacts: true
- 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-      
-      # Runs the Flyway Clean command against the Build database
-      - name: Migrate Build DB
-        if: env.executeBuild == 'true'
-        run: |
-          flyway -baselineOnMigrate="true" -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}" -configFiles="${{ GITHUB.WORKSPACE }}\flyway.conf" -locations="filesystem:${{ GITHUB.WORKSPACE }}\migrations" info migrate info -url="${{ secrets.DB_CONNECTION_STRING }}" -cleanDisabled='false' -reportFilename="Reports\ValidateVScripts" -user="${{ secrets.DB_USERNAME }} -password="${{ secrets.DB_PASSWORD }}
-        
+      - name: Checkout
+        uses: actions/checkout@v3.0.0
+
+      - name: Continuous Integration Flyway Clean Migrate
+        run: >-
+          docker run --rm
+          --volume ${{ github.workspace }}/migrations:/flyway/sql:ro
+          redgate/flyway
+          -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}"
+          -url="${{ secrets.DB_URL }}"
+          -user="${{ secrets.DB_USERNAME }}"
+          -password="${{ secrets.DB_PASSWORD }}"
+          -cleanDisabled=false clean migrate
+          
+  
   deploy:
+    name: Continuous Deployment Build
     runs-on: ubuntu-latest
     defaults:
       run: 
@@ -76,8 +74,10 @@ jobs:
         env:
           AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
           AWS_BUCKET_KEY_NAME: ${{ secrets.AWS_BUCKET_KEY_NAME }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         working-directory: ./terraform
-        run: terraform init -backend-config="bucket=${AWS_BUCKET_NAME}" -backend-config="key=${AWS_BUCKET_KEY_NAME}" -backend-config="region=${AWS_REGION}"
+        run: terraform init 
+        #-backend-config="bucket=${AWS_BUCKET_NAME}" -backend-config="key=${AWS_BUCKET_KEY_NAME}" -backend-config="region=${AWS_REGION}"
 
       - name: Terraform Validate
         id: validate
@@ -86,15 +86,20 @@ jobs:
       - name: Terraform Plan
         id: plan
         working-directory: ./terraform
-        run: terraform plan -no-color
+        run: terraform plan -no-color -out=tfplan
+        continue-on-error: true
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
+      - name: Save Terraform Plan
+        if: success()
+        run: echo "${{ steps.plan.outputs.stdout }}" > tfplan.tf
+
       - name: Terraform Apply # get's triggered only when there's a push (or merge) request to the main branch
         working-directory: ./terraform
         if: github.ref == 'refs/heads/main' && github.event_name == 'push' 
-        run: terraform apply -auto-approve -input=false 
+        run: terraform apply -auto-approve -input=false tfplan
 
       
