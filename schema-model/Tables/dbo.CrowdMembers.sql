@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[CrowdMembers](
 	crowdMemberId INT IDENTITY(1,1) NOT NULL,
 	userId INT NOT NULL,
-	rate INT
+	--rate INT
 );
 GO
 

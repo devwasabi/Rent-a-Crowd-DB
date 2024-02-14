@@ -1,51 +1,64 @@
-CREATE PROCEDURE InsertEventProcedure
+CREATE PROCEDURE InsertEventProcedure (
     @Email VARCHAR(255),
     @CrowdQuantity INT,
-    @AgeGroup VARCHAR(10),
-    @GenderSpec VARCHAR(6),
-    @EventDate DATE,
-    @EventTime TIME
+    @GenderSpec CHAR,
+    @EventDateTime DATETIME
+)
 AS
 BEGIN
-    DECLARE @UserID INT;
-    DECLARE @AddressID INT;
-    DECLARE @Payable INT;
-	DECLARE @EventID INT;
+    SET NOCOUNT ON;
 
-    -- Get UserID from UserInfo table based on the user's email
-    SELECT @UserID = userId
-    FROM UserInfo
+    DECLARE @Payable INT, @UserId INT, @AddressId INT, @Rate INT;
+
+    -- Validate Crowd Quantity
+    IF @CrowdQuantity > 10
+    BEGIN
+        RAISERROR('Crowd quantity cannot exceed 10', 16, 1);
+        RETURN;
+    END
+
+    -- Retrieve UserId and AddressId based on the provided email
+    SELECT @UserId = userId, @AddressId = addressId 
+    FROM UserInfo 
     WHERE Email = @Email;
 
-    -- Get AddressID from Address table based on the user's UserID
-    SELECT @AddressID = addressId
-    FROM Address
-    WHERE userId = @UserID;
-
-    -- Determine the rate based on the age group
-    IF @AgeGroup = 'toddler'
-        SET @Payable = 20 * @CrowdQuantity;
-    ELSE IF @AgeGroup = 'youth'
-        SET @Payable = 30 * @CrowdQuantity;
-    ELSE IF @AgeGroup = 'adult' OR @AgeGroup = 'all'
-        SET @Payable = 40 * @CrowdQuantity;
-
-    -- Check if the event date is in the future
-    IF @EventDate < GETDATE()
+    IF @UserId IS NULL
     BEGIN
-        -- Event date has passed, do not insert the event
-        RAISERROR('Event date cannot be in the past.', 16, 1);
+        RAISERROR('User with provided email does not exist', 16, 1);
         RETURN;
-    END;
+    END
 
-    -- Insert record into Events table with the calculated payable amount
-    INSERT INTO Events (crowdQuantity, userId, ageGroup, genderSpec, addressId, eventDate, eventTime, payable)
-    VALUES (@CrowdQuantity, @UserID, @AgeGroup, @GenderSpec, @AddressID, @EventDate, @EventTime, @Payable);
+    -- Retrieve the latest rate from the Rates table
+    SELECT TOP 1 @Rate = rate 
+    FROM Rates 
+    ORDER BY rateId DESC;
 
+    -- Calculate payable amount
+    SET @Payable = @Rate * @CrowdQuantity;
 
-	-- Get the ID of the newly inserted event
-    SELECT @EventID = SCOPE_IDENTITY();
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        -- Insert Event into table
+        INSERT INTO Events (addressId, userId, crowdQuantity, genderSpec, eventDateTime, payable)
+        VALUES (@AddressId, @UserId, @CrowdQuantity, @GenderSpec, @EventDateTime, @Payable);
 
-    -- Select all details of the inserted event
-    SELECT * FROM Events WHERE eventId = @EventID;
+        -- Commit the transaction
+        COMMIT TRANSACTION;
+
+        -- Display the record
+        SELECT * FROM Events WHERE eventId = SCOPE_IDENTITY();
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if an error occurs
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        -- Handle the error
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
+    END CATCH;
 END;

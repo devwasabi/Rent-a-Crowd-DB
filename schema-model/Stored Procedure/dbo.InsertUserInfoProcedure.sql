@@ -3,28 +3,50 @@ CREATE PROCEDURE InsertUserInfoProcedure (
     @LastName VARCHAR(100),
     @Gender CHAR,
     @DateOfBirth DATE,
-	@Email VARCHAR(255),
-    @UserID INT OUTPUT
+    @Email VARCHAR(255),
+    @Phone VARCHAR(10)
 )
 AS
 BEGIN
-    -- Calculate age from DateOfBirth
-    DECLARE @Age INT;
-    SET @Age = DATEDIFF(YEAR, @DateOfBirth, GETDATE());
+    SET NOCOUNT ON;
 
-    -- Determine AgeGroup based on age
-    DECLARE @AgeGroup VARCHAR(10);
-    IF @Age < 13
-        SET @AgeGroup = 'toddler';
-    ELSE IF @Age BETWEEN 13 AND 17
-        SET @AgeGroup = 'youth';
-    ELSE
-        SET @AgeGroup = 'adult';
+	-- Validate the email address
+    IF dbo.ValidateEmailAddress(@Email) = 0
+    BEGIN
+        RAISERROR('Invalid email address', 16, 1);
+        RETURN;
+    END
 
-    -- Insert UserInfo into table
-    INSERT INTO UserInfo (FirstName, LastName, Gender, AgeGroup, DateOfBirth,Email)
-    VALUES (@FirstName, @LastName, @Gender, @AgeGroup, @DateOfBirth,@Email);
+    -- Validate the phone number
+    IF dbo.ValidatePhoneNumber(@Phone) = 0
+    BEGIN
+        RAISERROR('Invalid phone number', 16, 1);
+        RETURN;
+    END
 
-    -- Get the last inserted identity value
-    SET @UserID = SCOPE_IDENTITY();
+    BEGIN TRY
+        BEGIN TRANSACTION;
+        
+        -- Insert UserInfo into table
+        INSERT INTO UserInfo (FirstName, LastName, Gender, DateOfBirth, Email, phone)
+        VALUES (@FirstName, @LastName, @Gender, @DateOfBirth, @Email, @Phone);
+
+        -- Commit the transaction
+        COMMIT TRANSACTION;
+
+        -- Display the record
+        SELECT * FROM UserInfo WHERE userId = SCOPE_IDENTITY();
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if an error occurs
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        -- Handle the error
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
+    END CATCH;
 END;

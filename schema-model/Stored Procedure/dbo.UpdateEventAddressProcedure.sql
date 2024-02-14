@@ -1,5 +1,5 @@
-CREATE PROCEDURE InsertAddressProcedure (
-    @userID INT,
+CREATE PROCEDURE UpdateEventAddressProcedure (
+    @EventId INT,
     @StreetNo INT,
     @StreetName VARCHAR(100),
     @Suburb VARCHAR(100),
@@ -17,13 +17,12 @@ BEGIN
         VALUES (@StreetNo, @StreetName, @Suburb, @City, @ZipCode);
 
         -- Get the newly inserted addressId
-        DECLARE @AddressId INT = SCOPE_IDENTITY();
+        DECLARE @NewAddressId INT = SCOPE_IDENTITY();
 
-        -- Update isActive column in UserInfo table and set addressId
-        UPDATE UserInfo
-        SET isActive = 1,
-            addressId = @AddressId
-        WHERE userId = @UserID;
+        -- Update addressId for the given event
+        UPDATE Events
+        SET addressId = @NewAddressId
+        WHERE eventId = @EventId;
 
         -- Commit the transaction
         COMMIT TRANSACTION;
