@@ -1,7 +1,8 @@
+
 CREATE PROCEDURE InsertEventProcedure (
     @Email VARCHAR(255),
     @CrowdQuantity INT,
-    @GenderSpec CHAR,
+    --@GenderSpec CHAR,
     @EventDateTime DATETIME
 )
 AS
@@ -16,7 +17,11 @@ BEGIN
         RAISERROR('Crowd quantity cannot exceed 10', 16, 1);
         RETURN;
     END
-
+	IF @EventDateTime <= GETDATE()
+	BEGIN
+        RAISERROR('Date cannot be in the past', 16, 1);
+        RETURN;
+    END
     -- Retrieve UserId and AddressId based on the provided email
     SELECT @UserId = userId, @AddressId = addressId 
     FROM UserInfo 
@@ -40,8 +45,8 @@ BEGIN
         BEGIN TRANSACTION;
         
         -- Insert Event into table
-        INSERT INTO Events (addressId, userId, crowdQuantity, genderSpec, eventDateTime, payable)
-        VALUES (@AddressId, @UserId, @CrowdQuantity, @GenderSpec, @EventDateTime, @Payable);
+        INSERT INTO Events (addressId, userId, crowdQuantity,  eventDateTime, payable)
+        VALUES (@AddressId, @UserId, @CrowdQuantity,  @EventDateTime, @Payable);
 
         -- Commit the transaction
         COMMIT TRANSACTION;
