@@ -6,7 +6,7 @@ AS
 BEGIN
     DECLARE @IsValid BIT = 0;
 
-    IF @PhoneNumber LIKE '0[6-8][0-9]{8}'
+    IF @PhoneNumber LIKE '0[6-8][0-9]{8}' AND LEN(@PhoneNumber) = 10
         SET @IsValid = 1;
 
     RETURN @IsValid;
