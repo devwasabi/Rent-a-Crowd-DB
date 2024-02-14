@@ -7,8 +7,7 @@ CREATE FUNCTION dbo.ValidatePhoneNumber (
 RETURNS BIT
 AS
 BEGIN
-    DECLARE @IsValid BIT = 0;
-  -- Check length is 10 digits
+  DECLARE @IsValid BIT = 0;
 	IF @PhoneNumber LIKE '[0-0][6-8][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' AND LEN(@PhoneNumber) = 10
     BEGIN
 	SET @IsValid = 1
