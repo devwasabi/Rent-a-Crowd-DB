@@ -22,6 +22,7 @@ module "db" {
   username = "bbdRentACrowd"
   port     = 1433
   publicly_accessible = true
+  vpc_security_group_ids = ["sg-0762cb989ab919d6d"]
 
   multi_az = false
 
