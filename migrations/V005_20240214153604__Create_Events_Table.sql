@@ -2,13 +2,14 @@ CREATE TABLE [dbo].[Events](
     eventId int IDENTITY(1,1),
 	addressId INT NOT NULL, --by default this should be the user's address unless the user wants to host in a different location
 	userId INT NOT NULL,
+	eventName VARCHAR(255) NOT NULL,
+	description VARCHAR(500) NOT NULL,
 	crowdQuantity INT NOT NULL,
     --ageGroup VARCHAR(10) NOT NULL,
     genderSpec CHAR,
     eventDateTime DATETIME NOT NULL,
 	payable INT DEFAULT 0,
 	createdAt DATETIME2 DEFAULT GetDate()
-
 );
 
 ALTER TABLE [dbo].[Events]
