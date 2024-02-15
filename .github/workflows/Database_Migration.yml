@@ -1,0 +1,40 @@
+name: "Flyway Database Migration"
+on:
+  push:
+    branches:
+      - main
+      - devwasabi_workflow
+      - terraform
+  pull_request:
+
+# env:
+#     SQLFLUFF_DIALECT: postgres
+#     DOCKER_IMAGE: redgate/flyway
+#         SCHEMAS: public
+
+# Permission can be added at job level or workflow level
+permissions:
+  id-token: write # This is required for aws oidc connection
+  contents: read # This is required for actions/checkout
+  pull-requests: write # This is required for the github bot to comment on our pull requests
+
+jobs:
+        
+  Continuous-Integration-Build:
+    name: Continuous Integration Build
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.0.0
+
+      - name: Continuous Integration Flyway Clean Migrate
+        run: >-
+          docker run --rm
+          --volume ${{ github.workspace }}/migrations:/flyway/sql:ro
+          redgate/flyway
+          -licenseKey="${{ secrets.FLYWAY_LICENSE_KEY }}"
+          -url="${{ secrets.DB_URL }}"
+          -user="${{ secrets.DB_USERNAME }}"
+          -password="${{ secrets.DB_PASSWORD }}"
+          -cleanDisabled=false clean migrate
