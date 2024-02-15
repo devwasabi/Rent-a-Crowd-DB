@@ -4,7 +4,12 @@ CREATE PROCEDURE InsertPaymentAndBookingsProcedure (
 )
 AS
 BEGIN
-    BEGIN TRANSACTION;
+    SET NOCOUNT ON;
+
+    DECLARE @PayableAmount INT, @CrowdQuantity INT, @EventDateTime DATETIME;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
 
         -- Get Payable Amount and Crowd Quantity for the event
         SELECT @PayableAmount = payable, @CrowdQuantity = crowdQuantity,@EventDateTime = EventDateTime
