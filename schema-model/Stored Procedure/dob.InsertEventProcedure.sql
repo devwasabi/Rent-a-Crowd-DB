@@ -1,15 +1,15 @@
-
 CREATE PROCEDURE InsertEventProcedure (
     @Email VARCHAR(255),
     @CrowdQuantity INT,
-    --@GenderSpec CHAR,
+    @EventName VARCHAR(255),
+	@description VARCHAR(500),
     @EventDateTime DATETIME
 )
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @Payable INT, @UserId INT, @AddressId INT, @Rate INT;
+    DECLARE @Payable INT, @UserId INT, @AddressId INT, @Rate INT, @isActive BIT
 
     -- Validate Crowd Quantity
     IF @CrowdQuantity > 10
@@ -23,13 +23,19 @@ BEGIN
         RETURN;
     END
     -- Retrieve UserId and AddressId based on the provided email
-    SELECT @UserId = userId, @AddressId = addressId 
+    SELECT @UserId = userId, @AddressId = addressId, @isActive =isActive 
     FROM UserInfo 
     WHERE Email = @Email;
 
     IF @UserId IS NULL
     BEGIN
         RAISERROR('User with provided email does not exist', 16, 1);
+        RETURN;
+    END
+
+	IF @isActive = 0
+    BEGIN
+        RAISERROR('User must be active to create an event', 16, 1);
         RETURN;
     END
 
@@ -45,8 +51,8 @@ BEGIN
         BEGIN TRANSACTION;
         
         -- Insert Event into table
-        INSERT INTO Events (addressId, userId, crowdQuantity,  eventDateTime, payable)
-        VALUES (@AddressId, @UserId, @CrowdQuantity,  @EventDateTime, @Payable);
+        INSERT INTO Events (addressId, userId, crowdQuantity,  eventDateTime, payable,eventName,description)
+        VALUES (@AddressId, @UserId, @CrowdQuantity,  @EventDateTime, @Payable,@EventName,@description);
 
         -- Commit the transaction
         COMMIT TRANSACTION;
