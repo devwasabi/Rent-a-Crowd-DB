@@ -1,4 +1,4 @@
-ALTER PROCEDURE InsertEventProcedure (
+CREATE PROCEDURE InsertEventProcedure (
     @Email VARCHAR(255),
     @CrowdQuantity INT,
     @EventName VARCHAR(255),
