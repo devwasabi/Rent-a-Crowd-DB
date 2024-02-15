@@ -6,13 +6,13 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @PayableAmount INT, @CrowdQuantity INT;
+    DECLARE @PayableAmount INT, @CrowdQuantity INT, @EventDateTime DATETIME;
 
     BEGIN TRY
         BEGIN TRANSACTION;
 
         -- Get Payable Amount and Crowd Quantity for the event
-        SELECT @PayableAmount = payable, @CrowdQuantity = crowdQuantity
+        SELECT @PayableAmount = payable, @CrowdQuantity = crowdQuantity,@EventDateTime = EventDateTime
         FROM Events
         WHERE eventId = @EventId;
 
@@ -41,7 +41,7 @@ BEGIN
                 SELECT crowdMemberId
                 FROM Bookings b
                 INNER JOIN Events e ON b.eventId = e.eventId
-                WHERE CONVERT(DATE, e.eventDateTime) = CONVERT(DATE, GETDATE()) -- Match the event date
+                WHERE CONVERT(DATE, e.eventDateTime) = CONVERT(DATE, @EventDateTime) -- Match the event date
             )
             ORDER BY NEWID();-- Randomize the selection of crowd members
 
