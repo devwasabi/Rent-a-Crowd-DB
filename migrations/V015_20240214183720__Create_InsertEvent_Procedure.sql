@@ -1,7 +1,8 @@
 CREATE PROCEDURE InsertEventProcedure (
     @Email VARCHAR(255),
     @CrowdQuantity INT,
-    --@GenderSpec CHAR,
+    @EventName VARCHAR(255),
+	@description VARCHAR(500),
     @EventDateTime DATETIME
 )
 AS
