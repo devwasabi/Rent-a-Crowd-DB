@@ -1,4 +1,4 @@
-CREATE PROCEDURE InsertPaymentAndBookingsProcedure (
+ALTER PROCEDURE InsertPaymentAndBookingsProcedure (
     @EventId INT,
     @TotalPaid INT
 )
