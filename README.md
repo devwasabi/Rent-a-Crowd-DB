@@ -82,3 +82,6 @@ Otherwise, once it's started running for over 30 seconds, there's a good chance 
 A bit of setup is needed on the database engine on the first run, as the Flyway migrations don't create the RentACrowd database for us.
 In `schema-model/DB-Init.sql`, I provided some scripts that create the database and a sample user script.
 To allow the Flyway scripts to run, though, we used the root user, created by Amazon when the database was created.
+
+# Workflow Creation
+Set up the github secrets for database migration job and the database deployment job. In order to give the workflow permission to deploy the database server on aws, aws credentials are required, which are set up in github secrets. In order to give the workflow permission to migrate the changes made to the database, we need to create github secrets (DB_USERNAME and DB_PASSWORD), which will be used to get access to the database during migration. Every time there changes made to the github branch (push or pull requests), the 2 jobs will run, which thus continuously deploys our database and migrates changes made to our database.
