@@ -77,3 +77,8 @@ For us grads, we only get adminstrator access as an option, so presumably you mi
 The mostly likely place that your setup will break is in `terraform apply`, if you don't have the necessary permissions. 
 Please refer back to the AWS section to ensure that you do have everything needed. 
 Otherwise, once it's started running for over 30 seconds, there's a good chance that everything is correct, and you just need to wait out the next 20 minutes while Terraform creates the database.
+
+# Database 
+A bit of setup is needed on the database engine on the first run, as the Flyway migrations don't create the RentACrowd database for us.
+In `schema-model/DB-Init.sql`, I provided some scripts that create the database and a sample user script.
+To allow the Flyway scripts to run, though, we used the root user, created by Amazon when the database was created.
